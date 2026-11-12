@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Webhook URL (HTTP POST):"
+        android:textStyle="bold"
+        android:textColor="#212529"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/editWebhookUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:hint="https://api.tuempresa.com/webhooks/pagomovil"
+        android:inputType="textUri"
+        android:textSize="14sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Secret Token (Header X-Webhook-Secret):"
+        android:textStyle="bold"
+        android:textColor="#212529"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/editWebhookSecret"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:hint="mi_token_secreto_opcional"
+        android:inputType="textPassword"
+        android:textSize="14sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Los pagos capturados se guardarán primero en la base SQLite local y se enviarán vía POST con reintentos automáticos de WorkManager."
+        android:textSize="12sp"
+        android:textColor="#6C757D" />
+
+</LinearLayout>
