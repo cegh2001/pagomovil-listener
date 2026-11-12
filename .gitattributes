@@ -1,0 +1,12 @@
+* text=auto
+
+# Unix shell scripts must retain LF line endings
+/gradlew text eol=lf
+*.sh text eol=lf
+
+# Windows batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files
+*.jar binary
