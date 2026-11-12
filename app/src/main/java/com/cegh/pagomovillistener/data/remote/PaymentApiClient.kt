@@ -47,7 +47,9 @@ class PaymentApiClient(
         try {
             val response = client.newCall(requestBuilder.build()).execute()
             response.use {
-                if (it.isSuccessful) {
+                // Treat both 2xx and 409 Conflict (already recorded by backend) as successful delivery
+                // to prevent WorkManager from entering an infinite retry loop for duplicates.
+                if (it.isSuccessful || it.code == 409) {
                     Result.success(Unit)
                 } else {
                     val errorBody = it.body?.string().orEmpty()

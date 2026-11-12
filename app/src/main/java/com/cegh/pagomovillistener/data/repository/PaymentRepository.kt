@@ -31,13 +31,41 @@ class PaymentRepository(
         .map { list -> list.map { it.toDomain() } }
 
     /**
-     * Local-First Outbox Pattern:
-     * 1. Save immediately to local Room DB as PENDING.
-     * 2. Attempt immediate HTTP POST.
-     * 3. On success, mark as SYNCED.
-     * 4. On failure or offline, mark as FAILED and schedule WorkManager.
+     * Local-First Outbox Pattern with Local Deduplication:
+     * 1. Check if the payment was already captured (prevents duplicates on notification re-posts).
+     * 2. Save immediately to local Room DB as PENDING if new.
+     * 3. Attempt immediate HTTP POST.
+     * 4. On success (or 409 duplicate), mark as SYNCED.
+     * 5. On failure or offline, mark as FAILED and schedule WorkManager.
      */
     suspend fun saveAndProcess(payment: PaymentNotification): Long = withContext(Dispatchers.IO) {
+        val existing = if (!payment.reference.isNullOrBlank()) {
+            paymentDao.findByReference(payment.reference)
+        } else {
+            paymentDao.findByRawBody(payment.rawBody)
+        }
+
+        if (existing != null) {
+            // Already synced: avoid inserting duplicate record or spamming the server
+            if (existing.syncStatus == com.cegh.pagomovillistener.domain.model.OutboxStatus.SYNCED.name) {
+                return@withContext existing.id
+            }
+
+            // If it was failed or pending, attempt resending the existing record
+            val targetUrl = preferences.webhookUrl
+            val secret = preferences.webhookSecret
+            val result = apiClient.postPayment(targetUrl, secret, existing.toDomain())
+
+            if (result.isSuccess) {
+                paymentDao.markAsSynced(existing.id)
+            } else {
+                val errorMsg = result.exceptionOrNull()?.message ?: "Unknown network error"
+                paymentDao.markAsFailed(existing.id, errorMsg)
+                scheduleOutboxWorker()
+            }
+            return@withContext existing.id
+        }
+
         val entity = PaymentEntity.fromDomain(payment)
         val insertedId = paymentDao.insert(entity)
         val savedPayment = payment.copy(id = insertedId)

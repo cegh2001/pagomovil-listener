@@ -19,6 +19,12 @@ interface PaymentDao {
     @Query("SELECT * FROM payments WHERE id = :id LIMIT 1")
     suspend fun getById(id: Long): PaymentEntity?
 
+    @Query("SELECT * FROM payments WHERE reference = :reference LIMIT 1")
+    suspend fun findByReference(reference: String): PaymentEntity?
+
+    @Query("SELECT * FROM payments WHERE rawBody = :rawBody LIMIT 1")
+    suspend fun findByRawBody(rawBody: String): PaymentEntity?
+
     @Query("SELECT * FROM payments WHERE syncStatus = 'PENDING' OR syncStatus = 'FAILED' ORDER BY receivedAt ASC")
     suspend fun getPendingPayments(): List<PaymentEntity>
 
