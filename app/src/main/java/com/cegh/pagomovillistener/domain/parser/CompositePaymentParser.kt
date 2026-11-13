@@ -5,7 +5,8 @@ import com.cegh.pagomovillistener.domain.model.PaymentNotification
 class CompositePaymentParser(
     private val parsers: List<PaymentParser> = listOf(
         BdvPaymentParser(),
-        BfcPaymentParser()
+        BfcPaymentParser(),
+        BancamigaPaymentParser()
     )
 ) : PaymentParser {
 

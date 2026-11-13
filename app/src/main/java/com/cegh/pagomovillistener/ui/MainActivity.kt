@@ -93,6 +93,13 @@ class MainActivity : AppCompatActivity() {
                 body = "Ha recibido un Pago por Bs. 35,00 del Celular 0414***9152 a traves del servicio TUBFC 11/11/2026"
             )
         }
+
+        binding.btnSimulateBancamiga.setOnClickListener {
+            simulateNotification(
+                title = "Bancamiga Suite",
+                body = "Has recibido un Pago Móvil desde el 04129897838 por Bs. 100,00."
+            )
+        }
     }
 
     private fun observePayments() {

@@ -1,6 +1,7 @@
 package com.cegh.pagomovillistener.parser
 
 import com.cegh.pagomovillistener.domain.model.BankType
+import com.cegh.pagomovillistener.domain.parser.BancamigaPaymentParser
 import com.cegh.pagomovillistener.domain.parser.BdvPaymentParser
 import com.cegh.pagomovillistener.domain.parser.BfcPaymentParser
 import com.cegh.pagomovillistener.domain.parser.CompositePaymentParser
@@ -15,7 +16,8 @@ class CompositePaymentParserTest {
     private val parser = CompositePaymentParser(
         listOf(
             BdvPaymentParser(),
-            BfcPaymentParser()
+            BfcPaymentParser(),
+            BancamigaPaymentParser { 1731450000000L }
         )
     )
 
@@ -71,6 +73,28 @@ class CompositePaymentParserTest {
         assertEquals("9152", payment?.phoneLastDigits)
         assertNull(payment?.reference)
         assertEquals("11/11/2026", payment?.date)
+    }
+
+    @Test
+    fun parseBancamigaNotificationFromRealScreenshot() {
+        val title = "Bancamiga Suite"
+        val body = "Has recibido un Pago Móvil desde el 04129897838 por Bs. 100,00."
+
+        assertTrue(parser.canParse(title, body))
+        val payment = parser.parse(title, body)
+
+        assertNotNull(payment)
+        assertEquals(BankType.BANCAMIGA, payment?.bank)
+        assertEquals(100.00, payment?.amountBs ?: 0.0, 0.001)
+        assertEquals("100,00", payment?.rawAmount)
+        assertEquals("04129897838", payment?.phoneNumber)
+        assertEquals("0412", payment?.phonePrefix)
+        assertEquals("7838", payment?.phoneLastDigits)
+        assertNull(payment?.reference)
+        assertNotNull(payment?.date)
+        assertTrue(payment?.date?.isNotBlank() == true)
+        assertNotNull(payment?.time)
+        assertEquals(1731450000000L, payment?.receivedAt)
     }
 
     @Test

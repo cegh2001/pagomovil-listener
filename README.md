@@ -66,6 +66,16 @@ Intercepting mobile banking notifications on Android requires resilience against
   * Reference: `null` (BFC push notifications omit the reference number)
   * Date: `11/11/2026`
 
+### 3. Bancamiga
+* **Notification Title:** `Bancamiga Suite`
+* **Sample Text:** `Has recibido un Pago Móvil desde el 04129897838 por Bs. 100,00.`
+* **Extracted Fields:**
+  * Amount: `100.00`
+  * Phone: `04129897838` (Prefix: `0412`, Last Digits: `7838`)
+  * Reference: `null` (Bancamiga push notifications omit the reference number)
+  * Date: Real-time system capture date (`dd/MM/yyyy`)
+  * Time: Real-time system capture time (`HH:mm`)
+
 ---
 
 ## 🚀 Webhook Payload (HTTP POST)
