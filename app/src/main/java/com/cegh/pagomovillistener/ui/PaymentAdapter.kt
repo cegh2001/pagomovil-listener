@@ -43,7 +43,7 @@ class PaymentAdapter(
 
             binding.textBank.text = item.bank.displayName
             binding.textAmount.text = "Bs. ${item.rawAmount}"
-            binding.textPhone.text = "Tel: ${item.phoneNumber}"
+            binding.textPhone.text = "Tel: ${item.phoneNumber.ifBlank { "N/A" }}"
             binding.textReference.text = "Ref: ${item.reference ?: "N/A"}"
             binding.textDate.text = "Fecha: ${item.date} ${item.time ?: ""}".trim()
             binding.textReceivedAt.text = "Capturado: ${timeFormat.format(Date(item.receivedAt))}"

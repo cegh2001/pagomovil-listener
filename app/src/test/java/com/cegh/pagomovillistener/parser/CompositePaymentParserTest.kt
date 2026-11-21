@@ -15,7 +15,7 @@ class CompositePaymentParserTest {
 
     private val parser = CompositePaymentParser(
         listOf(
-            BdvPaymentParser(),
+            BdvPaymentParser { 1731450000000L },
             BfcPaymentParser(),
             BancamigaPaymentParser { 1731450000000L }
         )
@@ -54,6 +54,45 @@ class CompositePaymentParserTest {
         assertEquals("0424", payment?.phonePrefix)
         assertEquals("2233", payment?.phoneLastDigits)
         assertEquals("987654321", payment?.reference)
+    }
+
+    @Test
+    fun parseBdvNamedSenderNotificationFromRealScreenshot() {
+        val title = "PagomóvilBDV recibido"
+        val body = "\"Recibiste un PagomovilBDV de ZELENIS BEATRIZ AGUILAR SANCHEZ por Bs.13.797,34 bajo el numero de operacion 008111758337\""
+
+        assertTrue(parser.canParse(title, body))
+        val payment = parser.parse(title, body)
+
+        assertNotNull(payment)
+        assertEquals(BankType.BDV, payment?.bank)
+        assertEquals(13797.34, payment?.amountBs ?: 0.0, 0.001)
+        assertEquals("13.797,34", payment?.rawAmount)
+        assertEquals("", payment?.phoneNumber)
+        assertNull(payment?.phonePrefix)
+        assertNull(payment?.phoneLastDigits)
+        assertEquals("008111758337", payment?.reference)
+        assertNotNull(payment?.date)
+        assertTrue(payment?.date?.isNotBlank() == true)
+        assertNotNull(payment?.time)
+        assertTrue(payment?.time?.isNotBlank() == true)
+        assertEquals(1731450000000L, payment?.receivedAt)
+    }
+
+    @Test
+    fun parseBdvNamedSenderNotificationWithAccents() {
+        val title = "PagomóvilBDV recibido"
+        val body = "Recibiste un PagomovilBDV de JUAN PEREZ por Bs. 250,00 bajo el número de operación 009988776655"
+
+        assertTrue(parser.canParse(title, body))
+        val payment = parser.parse(title, body)
+
+        assertNotNull(payment)
+        assertEquals(BankType.BDV, payment?.bank)
+        assertEquals(250.00, payment?.amountBs ?: 0.0, 0.001)
+        assertEquals("250,00", payment?.rawAmount)
+        assertEquals("", payment?.phoneNumber)
+        assertEquals("009988776655", payment?.reference)
     }
 
     @Test

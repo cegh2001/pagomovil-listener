@@ -48,6 +48,8 @@ Intercepting mobile banking notifications on Android requires resilience against
 ## 📦 Supported Banks & Formats
 
 ### 1. Banco de Venezuela (BDV)
+
+#### Format 1 (Interbank / Phone & Reference)
 * **Notification Title:** `PagomovilBDV recibido`
 * **Sample Text:** `Recibiste un PagomovilBDV por Bs.1,00 del 0412-9897838 Ref: 334023334023 en fecha 11-11-26 hora: 22:29.`
 * **Extracted Fields:**
@@ -56,6 +58,16 @@ Intercepting mobile banking notifications on Android requires resilience against
   * Reference: `334023334023`
   * Date: `11-11-26`
   * Time: `22:29`
+
+#### Format 2 (Same-bank / Named Sender & Operation Number)
+* **Notification Title:** `PagomóvilBDV recibido`
+* **Sample Text:** `"Recibiste un PagomovilBDV de ZELENIS BEATRIZ AGUILAR SANCHEZ por Bs.13.797,34 bajo el numero de operacion 008111758337"`
+* **Extracted Fields:**
+  * Amount: `13797.34`
+  * Phone: `""` (Not included in notification; Prefix: `null`, Last Digits: `null`)
+  * Reference: `008111758337`
+  * Date: Real-time system capture date (`dd-MM-yy`)
+  * Time: Real-time system capture time (`HH:mm`)
 
 ### 2. Banco Fondo Común (BFC)
 * **Notification Title:** `Pago recibido`
