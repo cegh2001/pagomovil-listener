@@ -70,6 +70,8 @@ Intercepting mobile banking notifications on Android requires resilience against
   * Time: Real-time system capture time (`HH:mm`)
 
 ### 2. Banco Fondo Común (BFC)
+
+#### Format 1 (Pago Móvil)
 * **Notification Title:** `Pago recibido`
 * **Sample Text:** `Ha recibido un Pago por Bs. 35,00 del Celular 0414***9152 a traves del servicio TUBFC 11/11/2026`
 * **Extracted Fields:**
@@ -77,6 +79,16 @@ Intercepting mobile banking notifications on Android requires resilience against
   * Phone: `0414***9152` (Prefix: `0414`, Last Digits: `9152`)
   * Reference: `null` (BFC push notifications omit the reference number)
   * Date: `11/11/2026`
+
+#### Format 2 (Bank Transfer / Otros Bancos)
+* **Notification Title:** `Transferencia recibida Otros Bancos`
+* **Sample Text:** `Has recibido una Transferencia Otros Bancos de Bs. 20.000,00 a tu cuenta 0151*********20 el dia 21/11/2026. La referencia del pago es 57677639`
+* **Extracted Fields:**
+  * Amount: `20000.00`
+  * Phone: `""` (Not included in notification; Prefix: `null`, Last Digits: `null`)
+  * Reference: `57677639`
+  * Date: `21/11/2026`
+  * Time: Real-time system capture time (`HH:mm`)
 
 ### 3. Bancamiga
 * **Notification Title:** `Bancamiga Suite`

@@ -16,7 +16,7 @@ class CompositePaymentParserTest {
     private val parser = CompositePaymentParser(
         listOf(
             BdvPaymentParser { 1731450000000L },
-            BfcPaymentParser(),
+            BfcPaymentParser { 1731450000000L },
             BancamigaPaymentParser { 1731450000000L }
         )
     )
@@ -112,6 +112,45 @@ class CompositePaymentParserTest {
         assertEquals("9152", payment?.phoneLastDigits)
         assertNull(payment?.reference)
         assertEquals("11/11/2026", payment?.date)
+    }
+
+    @Test
+    fun parseBfcOtherBanksTransferFromRealScreenshot() {
+        val title = "Transferencia recibida Otros Bancos"
+        val body = "Has recibido una Transferencia Otros Bancos de Bs. 20.000,00 a tu cuenta 0151*********20 el dia 21/11/2026. La referencia del pago es 57677639"
+
+        assertTrue(parser.canParse(title, body))
+        val payment = parser.parse(title, body)
+
+        assertNotNull(payment)
+        assertEquals(BankType.BFC, payment?.bank)
+        assertEquals(20000.0, payment?.amountBs ?: 0.0, 0.001)
+        assertEquals("20.000,00", payment?.rawAmount)
+        assertEquals("", payment?.phoneNumber)
+        assertNull(payment?.phonePrefix)
+        assertNull(payment?.phoneLastDigits)
+        assertEquals("57677639", payment?.reference)
+        assertEquals("21/11/2026", payment?.date)
+        assertNotNull(payment?.time)
+        assertTrue(payment?.time?.isNotBlank() == true)
+        assertEquals(1731450000000L, payment?.receivedAt)
+    }
+
+    @Test
+    fun parseBfcSameBankTransferWithAccent() {
+        val title = "Transferencia recibida"
+        val body = "Has recibido una Transferencia de Bs. 500,50 a tu cuenta 0151*********20 el día 21/11/2026. La referencia del pago es 99887766"
+
+        assertTrue(parser.canParse(title, body))
+        val payment = parser.parse(title, body)
+
+        assertNotNull(payment)
+        assertEquals(BankType.BFC, payment?.bank)
+        assertEquals(500.50, payment?.amountBs ?: 0.0, 0.001)
+        assertEquals("500,50", payment?.rawAmount)
+        assertEquals("", payment?.phoneNumber)
+        assertEquals("99887766", payment?.reference)
+        assertEquals("21/11/2026", payment?.date)
     }
 
     @Test
